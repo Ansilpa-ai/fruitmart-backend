@@ -1,7 +1,7 @@
 const userModel = require('../Model/UserModel')
 const productModel = require('../Model/ProductModel')
 const cartModel = require('../Model/CartModel')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 const path = require('path')
 
 const RegUser = async(req,res)=>{
