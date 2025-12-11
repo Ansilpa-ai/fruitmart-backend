@@ -1,6 +1,5 @@
-const express  = require('express');
+const express = require('express');
 const app = express();
-
 require('dotenv').config();
 
 // DB connection
@@ -9,8 +8,24 @@ dbConnect(process.env.MONGODB_URL);
 
 // CORS
 const cors = require("cors");
+
+// List of allowed frontend URLs
+const allowedOrigins = [
+  process.env.FRONTEND_URL,               // your Vercel frontend
+  "http://localhost:5173",                // local Vite dev server
+  "http://localhost:3000"                 // optional, local CRA
+];
+
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
+    origin: function(origin, callback){
+        // allow requests with no origin like Postman
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = `CORS policy: The origin ${origin} is not allowed.`;
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
     methods: "GET,POST,PUT,DELETE",
     credentials: true
 }));
@@ -38,7 +53,7 @@ app.get("/", (req, res) => {
     res.send("FruitMart Backend API is running...");
 });
 
-// ✔ IMPORTANT: Render needs this
+// Start server
 const PORT = process.env.PORT || 9000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
