@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: fruitmart-backend
+    env: node
+    region: singapore
+    plan: free
+    buildCommand: "npm install"
+    startCommand: "npm start"
+    repo: https://github.com/Ansilpa-ai/fruitmart-backend
+    branch: main
+    autoDeploy: true
+    envVars:
+      - key: MONGODB_URL
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
