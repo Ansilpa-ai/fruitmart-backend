@@ -1,201 +1,440 @@
-const userModel = require('../Model/UserModel')
-const productModel = require('../Model/ProductModel')
-const cartModel = require('../Model/CartModel')
-const bcrypt = require('bcryptjs')
-const path = require('path')
+// const userModel = require('../Model/UserModel')
+// const productModel = require('../Model/ProductModel')
+// const cartModel = require('../Model/CartModel')
+// const bcrypt = require('bcryptjs')
+// const path = require('path')
 
-const RegUser = async(req,res)=>{
-    try{
-        const {username,email,password} = req.body
-        const userExist = await userModel.findOne({email:email})
-        if(userExist){
-            res.json("UserExist")
-        }
-        else{
-            const salt = 10
-            const hashpassword = await bcrypt.hash(password,salt)
-            const user = await new userModel({
-                username,
-                email,
-                password:hashpassword,
-                role:"user"
-            })
-            user.save()
-            console.log(user)
-            res.json("User Added Successfully")
-        }
-    }
-    catch(err){
-      console.log("Error",err)
-    }
-}
+// const RegUser = async(req,res)=>{
+//     try{
+//         const {username,email,password} = req.body
+//         const userExist = await userModel.findOne({email:email})
+//         if(userExist){
+//             res.json("UserExist")
+//         }
+//         else{
+//             const salt = 10
+//             const hashpassword = await bcrypt.hash(password,salt)
+//             const user = await new userModel({
+//                 username,
+//                 email,
+//                 password:hashpassword,
+//                 role:"user"
+//             })
+//             user.save()
+//             console.log(user)
+//             res.json("User Added Successfully")
+//         }
+//     }
+//     catch(err){
+//       console.log("Error",err)
+//     }
+// }
 
-const Login = async(req,res)=>{
-    try{
-        const {email,password} = req.body
-        const user = await userModel.findOne({email:email})
+// const Login = async(req,res)=>{
+//     try{
+//         const {email,password} = req.body
+//         const user = await userModel.findOne({email:email})
         
-        if(user){
-            if ( await bcrypt.compare(String(password),String(user.password))){
-                res.json({msg:"Login Successful",role:user.role,status:200,id:user._id,username:user.username})
-                 console.log("User found:",user)
-            }
-            else{
-                res.json({msg:"Wrong Password",status:400})
-            }
-        }
-        else{
-            console.log("No user found")
-        }
-    }
-    catch(err){
-        console.log("Error",err)
-    }
-}
+//         if(user){
+//             if ( await bcrypt.compare(String(password),String(user.password))){
+//                 res.json({msg:"Login Successful",role:user.role,status:200,id:user._id,username:user.username})
+//                  console.log("User found:",user)
+//             }
+//             else{
+//                 res.json({msg:"Wrong Password",status:400})
+//             }
+//         }
+//         else{
+//             console.log("No user found")
+//         }
+//     }
+//     catch(err){
+//         console.log("Error",err)
+//     }
+// }
 
-const addProduct = async(req,res)=>{
-    try{
-    const {productname,price,quantity,category} = req.body
-    const image = req.files.map((file)=>file.path)
-    // const image  = req.file ? req.file.filename : null ;
-    const product = new productModel({
-        productname,
-        price,
-        quantity,
-        image,
-        category
-    })
-   await product.save()
-    console.log(product)
-    res.json("Product Added Successfully")
-    }
-    catch(err){
-     console.log("Error",err)
-     res.status(500).json("Server Error")
-    }
-}
+// const addProduct = async(req,res)=>{
+//     try{
+//     const {productname,price,quantity,category} = req.body
+//     const image = req.files.map((file)=>file.path)
+//     // const image  = req.file ? req.file.filename : null ;
+//     const product = new productModel({
+//         productname,
+//         price,
+//         quantity,
+//         image,
+//         category
+//     })
+//    await product.save()
+//     console.log(product)
+//     res.json("Product Added Successfully")
+//     }
+//     catch(err){
+//      console.log("Error",err)
+//      res.status(500).json("Server Error")
+//     }
+// }
 
-const viewProduct = async(req,res) =>{
-    try{
-        const products = await productModel.find({})
-        res.json(products)
-    }
-    catch(err){
-        console.log("Error",err)
-        res.json("No view")
-    }
-}
+// const viewProduct = async(req,res) =>{
+//     try{
+//         const products = await productModel.find({})
+//         res.json(products)
+//     }
+//     catch(err){
+//         console.log("Error",err)
+//         res.json("No view")
+//     }
+// }
 
-const deleteProduct = async(req,res)=>{
-    try{
-    const id = req.headers._id
-    await productModel.deleteOne({_id:id})
-    res.json("Product Deleted")
-    }
-    catch(err){
-      console.log("Error",err)
-    }
-}
+// const deleteProduct = async(req,res)=>{
+//     try{
+//     const id = req.headers._id
+//     await productModel.deleteOne({_id:id})
+//     res.json("Product Deleted")
+//     }
+//     catch(err){
+//       console.log("Error",err)
+//     }
+// }
  
-const editProduct = async(req,res)=>{
-    try{
-     const id = req.params.id
-     const product = await productModel.findOne({_id:id})
-     res.json(product)
-     console.log(product)
-     console.log(id)
-    }
-    catch(err){
-     console.log("Error",err)
-    }
-}
+// const editProduct = async(req,res)=>{
+//     try{
+//      const id = req.params.id
+//      const product = await productModel.findOne({_id:id})
+//      res.json(product)
+//      console.log(product)
+//      console.log(id)
+//     }
+//     catch(err){
+//      console.log("Error",err)
+//     }
+// }
 
-const updateProduct = async(req,res)=>{
-    try{
-     const id = req.params.id
-     const {price,quantity,category} = req.body
-     await productModel.updateOne({_id:id},{price,quantity,category})
-     res.json("Product Updated")
-    }
-    catch(err){
-        res.status(500).json("Server Error")
-    }
-}
+// const updateProduct = async(req,res)=>{
+//     try{
+//      const id = req.params.id
+//      const {price,quantity,category} = req.body
+//      await productModel.updateOne({_id:id},{price,quantity,category})
+//      res.json("Product Updated")
+//     }
+//     catch(err){
+//         res.status(500).json("Server Error")
+//     }
+// }
 
-const addCart = async(req,res)=>{
-    try{
-     const userId = req.params.id
-    const {productId,quantity} = req.body
+// const addCart = async(req,res)=>{
+//     try{
+//      const userId = req.params.id
+//     const {productId,quantity} = req.body
 
-    let cartItem = await cartModel.findOne({userId,productId})
+//     let cartItem = await cartModel.findOne({userId,productId})
     
-    if(cartItem){
-        cartItem.quantity += Number(quantity)
-        await cartItem.save()
-        return res.status(200).json({message:"Updated existing item",data:cartItem})
-        }
+//     if(cartItem){
+//         cartItem.quantity += Number(quantity)
+//         await cartItem.save()
+//         return res.status(200).json({message:"Updated existing item",data:cartItem})
+//         }
         
-       const newItem = new cartModel({userId,productId, quantity: Number(quantity)});
-        await newItem.save()
-        res.status(200).json({message:"Added new item",data:newItem})
-    }
-    catch(err){
-      console.log("Error",err)
-     res.status(500).json({message:"Error adding to cart"})
-    }
-}
+//        const newItem = new cartModel({userId,productId, quantity: Number(quantity)});
+//         await newItem.save()
+//         res.status(200).json({message:"Added new item",data:newItem})
+//     }
+//     catch(err){
+//       console.log("Error",err)
+//      res.status(500).json({message:"Error adding to cart"})
+//     }
+// }
 
 
 
-const viewCart = async(req,res) =>{
+// const viewCart = async(req,res) =>{
 
-    try{
-    const userId = req.params.id
+//     try{
+//     const userId = req.params.id
     
-     const items = await cartModel.find({userId}).populate("productId")
+//      const items = await cartModel.find({userId}).populate("productId")
      
-        res.status(200).json({message:"Cart loaded",data:items})
-       }
-    catch(err){
-      console.log("Error",err)
-      res.status(400).json({message:"Error loading cart"})
-    }
-}
+//         res.status(200).json({message:"Cart loaded",data:items})
+//        }
+//     catch(err){
+//       console.log("Error",err)
+//       res.status(400).json({message:"Error loading cart"})
+//     }
+// }
 
 
-// Update Cart Quantity
+// // Update Cart Quantity
 
-const updateCartQuantity = async(req,res) =>{
-    try{
-        const {cartId,quantity} = req.body
-        const cartItem = await cartModel.findById(cartId)
-         if(!cartItem){
-            return res.status(404).json({message:"cart item not found"})
-         }
+// const updateCartQuantity = async(req,res) =>{
+//     try{
+//         const {cartId,quantity} = req.body
+//         const cartItem = await cartModel.findById(cartId)
+//          if(!cartItem){
+//             return res.status(404).json({message:"cart item not found"})
+//          }
         
-         if(quantity <= 0){
-            await cartModel.findByIdAndDelete(cartId)
-            return res.status(200).json({message:"Item removed (qty=0)"})
-         }
-         cartItem.quantity = quantity
-         await cartItem.save()
+//          if(quantity <= 0){
+//             await cartModel.findByIdAndDelete(cartId)
+//             return res.status(200).json({message:"Item removed (qty=0)"})
+//          }
+//          cartItem.quantity = quantity
+//          await cartItem.save()
 
-         res.status(200).json({message:"Quantity uploaded",cartItem})
+//          res.status(200).json({message:"Quantity uploaded",cartItem})
+//     }
+//     catch(err){
+//         console.log("Error updating quantity:",err)
+//         res.status(500).json({message:"Server Error"})
+//     }
+// }
+
+
+
+
+
+
+
+
+// module.exports = {RegUser,Login,addProduct,viewProduct,deleteProduct,
+//                    editProduct,updateProduct,
+//                    addCart,viewCart,
+//                    updateCartQuantity}
+
+const userModel = require('../Model/UserModel');
+const productModel = require('../Model/ProductModel');
+const cartModel = require('../Model/CartModel');
+const bcrypt = require('bcryptjs');
+
+/* =========================
+   REGISTER USER
+========================= */
+const RegUser = async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+
+    const userExist = await userModel.findOne({ email });
+    if (userExist) {
+      return res.status(409).json({ msg: "User already exists" });
     }
-    catch(err){
-        console.log("Error updating quantity:",err)
-        res.status(500).json({message:"Server Error"})
+
+    const hashPassword = await bcrypt.hash(password, 10);
+
+    const user = new userModel({
+      username,
+      email,
+      password: hashPassword,
+      role: "user"
+    });
+
+    await user.save();
+
+    return res.status(201).json({ msg: "User registered successfully" });
+
+  } catch (err) {
+    console.error("Register error:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+/* =========================
+   LOGIN USER (FIXED)
+========================= */
+const Login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ msg: "Invalid email or password" });
     }
-}
 
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ msg: "Invalid email or password" });
+    }
 
+    return res.status(200).json({
+      msg: "Login successful",
+      id: user._id,
+      username: user.username,
+      role: user.role
+    });
 
+  } catch (err) {
+    console.error("Login error:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
 
+/* =========================
+   ADD PRODUCT
+========================= */
+const addProduct = async (req, res) => {
+  try {
+    const { productname, price, quantity, category } = req.body;
+    const image = req.files.map(file => file.path);
 
+    const product = new productModel({
+      productname,
+      price,
+      quantity,
+      image,
+      category
+    });
 
+    await product.save();
+    return res.status(201).json({ msg: "Product added successfully" });
 
+  } catch (err) {
+    console.error("Add product error:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
 
-module.exports = {RegUser,Login,addProduct,viewProduct,deleteProduct,
-                   editProduct,updateProduct,
-                   addCart,viewCart,
-                   updateCartQuantity}
+/* =========================
+   VIEW PRODUCTS
+========================= */
+const viewProduct = async (req, res) => {
+  try {
+    const products = await productModel.find({});
+    return res.status(200).json(products);
+  } catch (err) {
+    console.error("View product error:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+/* =========================
+   DELETE PRODUCT
+========================= */
+const deleteProduct = async (req, res) => {
+  try {
+    const id = req.headers._id;
+    await productModel.deleteOne({ _id: id });
+    return res.status(200).json({ msg: "Product deleted" });
+  } catch (err) {
+    console.error("Delete product error:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+/* =========================
+   EDIT PRODUCT
+========================= */
+const editProduct = async (req, res) => {
+  try {
+    const product = await productModel.findById(req.params.id);
+    return res.status(200).json(product);
+  } catch (err) {
+    console.error("Edit product error:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+/* =========================
+   UPDATE PRODUCT
+========================= */
+const updateProduct = async (req, res) => {
+  try {
+    const { price, quantity, category } = req.body;
+    await productModel.updateOne(
+      { _id: req.params.id },
+      { price, quantity, category }
+    );
+    return res.status(200).json({ msg: "Product updated" });
+  } catch (err) {
+    console.error("Update product error:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+/* =========================
+   ADD TO CART
+========================= */
+const addCart = async (req, res) => {
+  try {
+    const { productId, quantity } = req.body;
+    const userId = req.params.id;
+
+    let cartItem = await cartModel.findOne({ userId, productId });
+
+    if (cartItem) {
+      cartItem.quantity += Number(quantity);
+      await cartItem.save();
+      return res.status(200).json({ msg: "Cart updated", data: cartItem });
+    }
+
+    const newItem = new cartModel({
+      userId,
+      productId,
+      quantity: Number(quantity)
+    });
+
+    await newItem.save();
+    return res.status(201).json({ msg: "Item added to cart", data: newItem });
+
+  } catch (err) {
+    console.error("Add cart error:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+/* =========================
+   VIEW CART
+========================= */
+const viewCart = async (req, res) => {
+  try {
+    const items = await cartModel
+      .find({ userId: req.params.id })
+      .populate("productId");
+
+    return res.status(200).json(items);
+  } catch (err) {
+    console.error("View cart error:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+/* =========================
+   UPDATE CART QUANTITY
+========================= */
+const updateCartQuantity = async (req, res) => {
+  try {
+    const { cartId, quantity } = req.body;
+
+    const cartItem = await cartModel.findById(cartId);
+    if (!cartItem) {
+      return res.status(404).json({ msg: "Cart item not found" });
+    }
+
+    if (quantity <= 0) {
+      await cartModel.findByIdAndDelete(cartId);
+      return res.status(200).json({ msg: "Item removed" });
+    }
+
+    cartItem.quantity = quantity;
+    await cartItem.save();
+
+    return res.status(200).json({ msg: "Quantity updated", cartItem });
+
+  } catch (err) {
+    console.error("Update cart error:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+/* =========================
+   EXPORTS
+========================= */
+module.exports = {
+  RegUser,
+  Login,
+  addProduct,
+  viewProduct,
+  deleteProduct,
+  editProduct,
+  updateProduct,
+  addCart,
+  viewCart,
+  updateCartQuantity
+};
