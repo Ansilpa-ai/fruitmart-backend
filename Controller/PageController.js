@@ -30,28 +30,55 @@ const RegUser = async(req,res)=>{
     }
 }
 
-const Login = async(req,res)=>{
-    try{
-        const {email,password} = req.body
-        const user = await userModel.findOne({email:email})
+
+const Login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ msg: "Invalid email or password" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ msg: "Invalid email or password" });
+    }
+
+    return res.status(200).json({
+      msg: "Login successful",
+      id: user._id,
+      username: user.username,
+      role: user.role
+    });
+
+  } catch (err) {
+    console.error("Login error:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+// const Login = async(req,res)=>{
+//     try{
+//         const {email,password} = req.body
+//         const user = await userModel.findOne({email:email})
         
-        if(user){
-            if ( await bcrypt.compare(String(password),String(user.password))){
-                res.json({msg:"Login Successful",role:user.role,status:200,id:user._id,username:user.username})
-                 console.log("User found:",user)
-            }
-            else{
-                res.json({msg:"Wrong Password",status:400})
-            }
-        }
-        else{
-            console.log("No user found")
-        }
-    }
-    catch(err){
-        console.log("Error",err)
-    }
-}
+//         if(user){
+//             if ( await bcrypt.compare(String(password),String(user.password))){
+//                 res.json({msg:"Login Successful",role:user.role,status:200,id:user._id,username:user.username})
+//                  console.log("User found:",user)
+//             }
+//             else{
+//                 res.json({msg:"Wrong Password",status:400})
+//             }
+//         }
+//         else{
+//             console.log("No user found")
+//         }
+//     }
+//     catch(err){
+//         console.log("Error",err)
+//     }
+// }
 
 const addProduct = async(req,res)=>{
     try{
